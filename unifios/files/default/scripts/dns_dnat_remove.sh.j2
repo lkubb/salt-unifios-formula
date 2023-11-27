@@ -1,0 +1,42 @@
+#!/bin/bash
+
+IPV4_IP="{{ unifios.dns_dnat.dest }}"
+{%- if unifios.dns_dnat.forced_interfaces %}
+FORCED_INTFC="{{ unifios.dns_dnat.forced_interfaces | join(" ") }}"
+{%- endif %}
+{%- if unifios.dns_dnat.forced_subnets %}
+FORCED_SUBNETS="{{ unifios.dns_dnat.forced_subnets | join(" ") }}"
+{%- endif %}
+{%- if unifios.dns_dnat.hairpin_snat %}
+HAIRPIN_NAT_SOURCE_IP="{{ unifios.dns_dnat.hairpin_snat }}"
+{%- endif %}
+
+{%- if unifios.dns_dnat.forced_interfaces %}
+
+for intfc in ${FORCED_INTFC}; do
+  if [ -d "/sys/class/net/${intfc}" ]; then
+    for proto in udp tcp; do
+      prerouting_rule="PREROUTING -i ${intfc} -p ${proto} ! -s ${IPV4_IP} ! -d ${IPV4_IP} --dport 53 -j DNAT --to ${IPV4_IP}"
+      iptables -t nat -C ${prerouting_rule} && iptables -t nat -D ${prerouting_rule}
+    done
+  fi
+done
+{%- endif %}
+
+{%- if unifios.dns_dnat.forced_subnets %}
+
+for subnet in ${FORCED_SUBNETS}; do
+  for proto in udp tcp; do
+    prerouting_rule="PREROUTING -s ${subnet} -p ${proto} ! -d ${IPV4_IP} --dport 53 -j DNAT --to ${IPV4_IP}"
+    iptables -t nat -C ${prerouting_rule} && iptables -t nat -D ${prerouting_rule}
+  done
+done
+{%- endif %}
+
+{%- if unifios.dns_dnat.hairpin_snat %}
+
+for proto in udp tcp; do
+  snat_rule="POSTROUTING -p ${proto} --dport 53 -m conntrack --ctstate DNAT ! --ctorigdst ${IPV4_IP} -j SNAT --to-source ${HAIRPIN_NAT_SOURCE_IP}"
+  iptables -t nat -C ${snat_rule} && iptables -t nat -D ${snat_rule}
+done
+{%- endif %}

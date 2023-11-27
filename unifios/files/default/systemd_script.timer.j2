@@ -1,0 +1,24 @@
+{%- macro render(val) -%}
+{%- if val is list %}{{ val | join(" ") }}
+{%- elif val in [true, false] %}{{ val | lower }}
+{%- else %}{{ val }}
+{%- endif %}
+{%- endmacro -%}
+
+[Unit]
+Description=Timer for {{ unifios.lookup | traverse(name ~ ":description", name) }}
+{%- for param, val in unifios.lookup | traverse(name ~ ":timer_unit", {}) | dictsort %}
+{%-   if val is not none %}
+{{ param }}={{ render(val) }}
+{%-   endif %}
+{%- endfor %}
+
+[Timer]
+{%- for param, val in unifios | traverse(name ~ ":timer", {}) | dictsort %}
+{%-   if val is not none %}
+{{ param }}={{ render(val) }}
+{%-   endif %}
+{%- endfor %}
+
+[Install]
+WantedBy=timers.target

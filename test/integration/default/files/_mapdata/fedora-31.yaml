@@ -1,0 +1,62 @@
+# yamllint disable rule:indentation rule:line-length
+# Fedora-31
+---
+values:
+  added_in_defaults: defaults_value
+  added_in_lookup: lookup_value
+  added_in_pillar: pillar_value
+  lookup:
+    arch: amd64
+    rootgroup: root
+    cert:
+      crt_path: unifi-core/config/unifi-core.crt
+      key_path: unifi-core/config/unifi-core.key
+    script_dir: /data/scripts
+  authorized_keys:
+    absent: []
+    present: []
+    sync: []
+  cert:
+    ca_server: null
+    certificate_managed:
+      authorityKeyIdentifier: keyid:always
+      basicConstraints: critical, CA:false
+      days_remaining: 7
+      days_valid: 30
+      subjectKeyIdentifier: hash
+    private_key_managed:
+      algo: rsa
+      keysize: 3072
+      new: true
+    signing_policy: null
+  dns_dnat:
+    dest: null
+    forced_interfaces: []
+    forced_subnets: []
+    hairpin_snat: null
+    timer:
+      OnCalendar: '*:0/5'
+      Persistent: true
+  mods: []
+  on_boot_service: true
+  map_jinja:
+    sources:
+    - Y:G@osarch
+    - Y:G@os_family
+    - Y:G@os
+    - Y:G@osfinger
+    - C@unifios
+    - Y:G@id
+  master: template-master
+  tofs:
+    files_switch:
+    - any/path/can/be/used/here
+    - id
+    - roles
+    - osfinger
+    - os
+    - os_family
+    source_files:
+      unifios-config-file-file-managed:
+      - example.tmpl.jinja
+  winner: pillar

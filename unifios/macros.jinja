@@ -1,0 +1,100 @@
+{%- from tplroot ~ "/libtofsstack.jinja" import files_switch with context %}
+
+{%- macro put_script(name, config, service=true, timer=false, unit_source="systemd_script") -%}
+{{ name }} script is present:
+  file.managed:
+    - name: {{ config.lookup.script_dir | path_join(name ~ ".sh") }}
+    - source: {{ files_switch(
+                    ["scripts/" ~ name ~ ".sh", "scripts/" ~ name ~".sh.j2"],
+                    config=config,
+                    lookup=name ~ " script is present",
+                 )
+              }}
+    - user: root
+    - group: root
+    - mode: '0755'
+    - makedirs: true
+    - template: jinja
+    - context:
+        unifios: {{ config | json }}
+
+{%- if service %}
+
+{{ name }} unit is present:
+  file.managed:
+    - name: /etc/systemd/system/{{ name }}.service
+    - source: {{ files_switch(
+                    [unit_source ~ ".service.j2"],
+                    config=config,
+                    lookup=name ~ " unit is present",
+                 )
+              }}
+    - user: root
+    - group: root
+    - mode: '0644'
+    - makedirs: true
+    - template: jinja
+    - context:
+        unifios: {{ config | json }}
+        name: {{ name }}
+        timer: {{ timer }}
+    - require:
+      - file: {{ config.lookup.script_dir | path_join(name ~ ".sh") }}
+
+{%-     if timer %}
+
+{{ name }} timer is present:
+  file.managed:
+    - name: /etc/systemd/system/{{ name }}.timer
+    - source: {{ files_switch(
+                    [unit_source ~ ".timer.j2"],
+                    config=config,
+                    lookup=name ~ " timer is present",
+                 )
+              }}
+    - user: root
+    - group: root
+    - mode: '0644'
+    - makedirs: true
+    - template: jinja
+    - context:
+        unifios: {{ config | json }}
+        name: {{ name }}
+    - require:
+      - file: /etc/systemd/system/{{ name }}.service
+{%-     endif %}
+
+{{ name }} is enabled and running:
+  service.running:
+    - name: {{ name ~ (".timer" if timer else ".service") }}
+    - enable: true
+    - watch:
+      - file: /etc/systemd/system/{{ name }}.service
+{%-     if timer %}
+      - file: /etc/systemd/system/{{ name }}.timer
+{%-     endif %}
+{%-   endif %}
+{%- endmacro %}
+
+
+{%- macro script_clean(name, config, service=true, timer=false) -%}
+{%-   if service %}
+{{ name }} is disabled and dead:
+  service.dead:
+    - name: {{ name ~ (".timer" if timer else ".service") }}
+    - disable: true
+{%-   endif %}
+
+{{ name }} files are absent:
+  file.absent:
+    - names:
+      - {{ config.lookup.script_dir | path_join(name ~ ".sh") }}
+{%-   if service %}
+      - /etc/systemd/system/{{ name }}.service
+{%-     if timer %}
+      - /etc/systemd/system/{{ name }}.timer
+{%-     endif %}
+      - require:
+        - service: {{ name ~ (".timer" if timer else ".service") }}
+{%-   endif %}
+{%- endmacro %}

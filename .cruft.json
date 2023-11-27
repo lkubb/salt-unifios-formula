@@ -1,0 +1,74 @@
+{
+  "template": "https://github.com/lkubb/salt-template-formula",
+  "commit": "b65b98c8b0f95cfed8bf31868cedbd08b9da3e8c",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "_extensions": [
+        "local_extensions.YAMLDumper"
+      ],
+      "_jinja2_env_vars": {
+        "block_start_string": "{!",
+        "block_end_string": "!}",
+        "variable_start_string": "{=",
+        "variable_end_string": "=}",
+        "comment_start_string": "{@",
+        "comment_end_string": "@}"
+      },
+      "name": "UniFi OS",
+      "abbr": "unifios",
+      "abbr_pysafe": "unifios",
+      "pkg": "",
+      "needs_repo": "",
+      "config": "",
+      "service": "",
+      "subcomponent": "",
+      "subcomponent_config": "",
+      "git_username": "lkubb",
+      "lookup": {
+        "cert": {
+          "crt_path": "unifi-core/config/unifi-core.crt",
+          "key_path": "unifi-core/config/unifi-core.key"
+        },
+        "script_dir": "/data/scripts"
+      },
+      "settings": {
+        "authorized_keys": {
+          "present": [],
+          "absent": [],
+          "sync": []
+        },
+        "cert": {
+          "ca_server": null,
+          "signing_policy": null,
+          "certificate_managed": {
+            "days_remaining": 7,
+            "days_valid": 30,
+            "authorityKeyIdentifier": "keyid:always",
+            "basicConstraints": "critical, CA:false",
+            "subjectKeyIdentifier": "hash"
+          },
+          "private_key_managed": {
+            "algo": "rsa",
+            "keysize": 3072,
+            "new": true
+          }
+        },
+        "dns_dnat": {
+          "dest": null,
+          "forced_interfaces": [],
+          "forced_subnets": [],
+          "hairpin_snat": null,
+          "timer": {
+            "OnCalendar": "*:0/5",
+            "Persistent": true
+          }
+        },
+        "mods": [],
+        "on_boot_service": true
+      },
+      "_template": "https://github.com/lkubb/salt-template-formula"
+    }
+  },
+  "directory": null
+}

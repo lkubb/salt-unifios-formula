@@ -1,0 +1,103 @@
+# vim: ft=yaml
+# yamllint disable rule:comments-indentation
+---
+unifios:
+    # Manages SSH keys for the root account
+  authorized_keys:
+    absent: []
+    present: []
+    sync: []
+    # Manages a certificate for the GUI
+  cert:
+      # A minion ID of the CA server to use.
+      # This also works for SSH minions. If unspecified,
+      # will sign it locally on the target.
+    ca_server: null
+      # When ca_server is specified, a signing_policy is required
+    signing_policy: null
+      # Parameters for x509.certificate_managed
+    certificate_managed:
+      authorityKeyIdentifier: keyid:always
+      basicConstraints: critical, CA:false
+      days_remaining: 7
+      days_valid: 30
+      subjectKeyIdentifier: hash
+      # Parameters for x509.private_key_managed
+    private_key_managed:
+      algo: rsa
+      keysize: 3072
+      new: true
+    # Settings for DNS DNAT service/timer
+  dns_dnat:
+      # Destination IP v4 for rogue DNS packets
+    dest: null
+      # Interface names for which all DNS packets should be
+      # routed to dest
+    forced_interfaces: []
+      # CIDR subnets for which all DNS packets should be
+      # routed to dest
+    forced_subnets: []
+      # If the rerouted target can be part of the same network as the source,
+      # the source IP of DNAT'd packets should be changed, otherwise the response
+      # packet will be sent directly and discarded.
+      # Set this to the firewall's IP address of the problematic network.
+    hairpin_snat: null
+      # https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html
+      # This will be serialized as set. If you want to remove parameters, set their
+      # values to null.
+    timer:
+        # https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+        # This runs the idempotent check script every 5 minutes
+      OnCalendar: '*:0/5'
+      Persistent: true
+    # state.apply / highstate helper.
+    # List of mods in salt://unifios/mods/ that should be included
+  mods: []
+    # state.apply / highstate helper.
+    # This installs the on_boot service by default when just
+    # ``unifios`` is applied. The mods included in this formula
+    # do not require it, but this allows you to sync simple scripts
+    # that you require to run on each reboot without writing the
+    # corresponding state file as a mod.
+  on_boot_service: true
+
+  lookup:
+    cert:
+      crt_path: unifi-core/config/unifi-core.crt
+      key_path: unifi-core/config/unifi-core.key
+    # The mods in this formula are written for UnifiOS 3.x, where
+    # persistence is possible without installing a package. Their
+    # corresponding scripts will be put into this directory.
+    # If you're using this for 1.x, you will need to sync the on_boot.d
+    # directory. Note that the installation for the services is not
+    # implemented, see https://github.com/unifi-utilities/unifios-utilities/tree/v1.12.x
+    script_dir: /data/scripts
+
+  tofs:
+      # The files_switch key serves as a selector for alternative
+      # directories under the formula files directory. See TOFS pattern
+      # doc for more info.
+      # Note: Any value not evaluated by `config.get` will be used literally.
+      # This can be used to set custom paths, as many levels deep as required.
+    files_switch:
+      - any/path/can/be/used/here
+      - id
+      - roles
+      - osfinger
+      - os
+      - os_family
+
+      # All aspects of path/file resolution are customisable using the options below.
+      # This is unnecessary in most cases; there are sensible defaults.
+      # Default path: salt://< path_prefix >/< dirs.files >/< dirs.default >
+      # I.e.: salt://unifios/files/default
+      # path_prefix: template_alt
+      # dirs:
+      #   files: files_alt
+      #   default: default_alt
+      # The entries under `source_files` are prepended to the default source files
+      # given for the state
+    source_files:
+      UniFi OS configuration is managed:
+        - 'example_alt.tmpl'
+        - 'example_alt.tmpl.jinja'

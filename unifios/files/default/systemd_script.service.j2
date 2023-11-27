@@ -1,0 +1,29 @@
+{%- macro render(val) -%}
+{%- if val is list %}{{ val | join(" ") }}
+{%- elif val in [true, false] %}{{ val | lower }}
+{%- else %}{{ val }}
+{%- endif %}
+{%- endmacro -%}
+
+[Unit]
+Description={{ unifios.lookup | traverse(name ~ ":description", name) }}
+{%- for param, val in unifios.lookup | traverse(name ~ ":service_unit", {}) | dictsort %}
+{%-   if val is not none %}
+{{ param }}={{ render(val) }}
+{%-   endif %}
+{%- endfor %}
+
+[Service]
+Type={{ unifios.lookup | traverse(name ~ ":type", "oneshot") }}
+ExecStart={{ unifios.lookup.script_dir | path_join(name ~ ".sh") }}
+{%- for param, val in unifios.lookup | traverse(name ~ ":service_service", {}) | dictsort %}
+{%-   if val is not none %}
+{{ param }}={{ render(val) }}
+{%-   endif %}
+{%- endfor %}
+
+{%- if unifios.lookup | traverse(name ~ ":wanted_by") or not timer %}
+
+[Install]
+WantedBy={{ unifios.lookup | traverse(name ~ ":wanted_by", ["multi-user.target"]) | join(" ") }}
+{%- endif %}

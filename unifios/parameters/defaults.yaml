@@ -1,0 +1,48 @@
+# vim: ft=yaml
+#
+# Set default values.
+---
+values:
+  lookup:
+    rootgroup: root
+    datadir: {{ "/mnt/data" if grains["uos_firmware"] < [2] else "/data" }}
+    cert:
+      crt_path: unifi-core/config/unifi-core.crt
+      key_path: unifi-core/config/unifi-core.key
+    script_dir: /data/scripts
+  authorized_keys:
+    absent: []
+    present: []
+    sync: []
+  cert:
+    ca_server: null
+    certificate_managed:
+      authorityKeyIdentifier: keyid:always
+      basicConstraints: critical, CA:false
+      days_remaining: 7
+      days_valid: 30
+      subjectKeyIdentifier: hash
+    private_key_managed:
+      algo: rsa
+      keysize: 3072
+      new: true
+    signing_policy: null
+  dns_dnat:
+    dest: null
+    forced_interfaces: []
+    forced_subnets: []
+    hairpin_snat: null
+    timer:
+      OnCalendar: '*:0/5'
+      Persistent: true
+  mods: []
+  on_boot_service: true
+  tofs:
+    files_switch:
+      - id
+      - roles
+      - uos_firmware_major
+  # Just here for testing
+  added_in_defaults: defaults_value
+  winner: defaults
+...
