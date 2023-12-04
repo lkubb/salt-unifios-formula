@@ -52,18 +52,6 @@ Either specify present/absent OR sync.
 Just paste the whole key as a list item.
 
 
-``unifios.mods.certificate``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Manages a certificate for the GUI.
-
-When using a ``ca_server``, will rely on the SSH wrapper emulation
-of ``x509.certificate_managed`` since the remote does not have access
-to the event bus.
-
-The wrapper is found in my PR #65654 or in my formula for a private CA:
-https://github.com/lkubb/salt-private-ca-formula
-
-
 ``unifios.mods.dns_dnat``
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Manages a script that ensures firewall rules are in place that redirect
@@ -86,6 +74,18 @@ to avoid pulling in a lot of dev dependencies.
 ``unifios.mods.pkgs``
 ^^^^^^^^^^^^^^^^^^^^^
 Manages installed system packages.
+
+
+``unifios.mods.webui_cert``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Manages a certificate for the GUI.
+
+When using a ``ca_server``, will rely on the SSH wrapper emulation
+of ``x509.certificate_managed`` since the remote does not have access
+to the event bus.
+
+The wrapper is found in my PR #65654 or in my formula for a private CA:
+https://github.com/lkubb/salt-private-ca-formula
 
 
 ``unifios.clean``
@@ -115,12 +115,6 @@ If this removes all of them, you will have to login
 using the password specified in the GUI.
 
 
-``unifios.mods.certificate.clean``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Does not remove the certificate/key because this would break
-the UI service. You will need to do this manually.
-
-
 ``unifios.mods.dns_dnat.clean``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Disables dns_nat service and timer and removes all related files.
@@ -134,5 +128,11 @@ Removes wanted pip packages.
 ``unifios.mods.pkgs.clean``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Removes wanted system packages.
+
+
+``unifios.mods.webui_cert.clean``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Does not remove the certificate/key because this would break
+the UI service. You will need to do this manually.
 
 
