@@ -32,6 +32,18 @@ corresponding state file as a mod.
 The service is slightly modified from https://github.com/unifi-utilities/unifios-utilities/tree/main/on-boot-script-2.x
 
 
+``unifios.helpers.pip_pkgs``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+On Debian, installing pip pulls in a lot of dependencies.
+Installing pure Python or pre-compiled wheels for the platform
+does not require them though.
+
+This state downloads the ``pip`` wheel and uses it to install
+other specified packages without pulling all those dev dependencies.
+The specified packages **must** either be pure Python packages
+or have binary wheel distributions for the platform (``aarch64``).
+
+
 ``unifios.mods.authorized_keys``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Manages SSH keys that can authenticate as root.
@@ -62,6 +74,20 @@ In short, ensures that clients on these subnets/interfaces will use
 a local DNS resolver (does not account for DoH/DoT etc.).
 
 
+``unifios.mods.pip_pkgs``
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Installs global Python packages with ``pip``.
+
+Note that pip is not installed by default. You can either install the
+``python3-pip`` system package or use `unifios.helpers.pip_pkgs`_
+to avoid pulling in a lot of dev dependencies.
+
+
+``unifios.mods.pkgs``
+^^^^^^^^^^^^^^^^^^^^^
+Manages installed system packages.
+
+
 ``unifios.clean``
 ^^^^^^^^^^^^^^^^^
 *Meta-state*.
@@ -75,6 +101,11 @@ and removes the on_boot service.
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Stops and disables the on_boot service, removes synced scripts
 and the corresponding unit file.
+
+
+``unifios.helpers.pip_pkgs.clean``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Removes pip and wanted packages.
 
 
 ``unifios.mods.authorized_keys.clean``
@@ -93,5 +124,15 @@ the UI service. You will need to do this manually.
 ``unifios.mods.dns_dnat.clean``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Disables dns_nat service and timer and removes all related files.
+
+
+``unifios.mods.pip_pkgs.clean``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Removes wanted pip packages.
+
+
+``unifios.mods.pkgs.clean``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Removes wanted system packages.
 
 
