@@ -3,7 +3,10 @@
 ---
 unifios:
 
-    # Manage SSH keys for the root account
+    # Manage SSH keys for the root account.
+    # This is just a helper. For more comprehensive OpenSSH management, I would
+    # advise using https://github.com/lkubb/salt-openssh-formula
+    # (works with salt-ssh)
   authorized_keys:
     absent: []
     present: []
