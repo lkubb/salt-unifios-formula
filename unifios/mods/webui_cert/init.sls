@@ -18,8 +18,10 @@
 {%- set key_file = unifios.lookup.datadir | path_join(unifios.lookup.cert.key_path) %}
 
 {%- if unifios.cert.ca_server %}
-{%-   set pk_managed = unifios.cert.private_key_managed %}
-{%-   do pk_managed.update({"name": key_file}) %}
+{%-   set pk_managed = salt["defaults.deepcopy"](unifios.cert.private_key_managed) %}
+{%-   do pk_managed.update({"name": key_file, "user": "root", "group": "unifi", "mode": "0640", "makedirs": true}) %}
+{%-   set cert_managed = salt["defaults.deepcopy"](unifios.cert.certificate_managed) %}
+{%-   do cert_managed.update({"user": "root", "group": "unifi"}) %}
 {{
     salt["x509.certificate_managed_wrapper"](
       crt_file,
@@ -39,12 +41,8 @@
     {{ unifios.cert.private_key_managed | dict_to_sls_yaml_params | indent(4) }}
 {%-   if unifios.cert.private_key_managed.get("new") and salt["file.file_exists"](key_file) %}
     - prereq:
-      - {{ crt_file }}_crt
+      - x509: {{ crt_file }}
 {%-   endif %}
-    - makedirs: true
-    - user: root
-    - group: unifi
-    - mode: '0640'
 
 {{ crt_file }}_crt:
   x509.certificate_managed:
@@ -52,17 +50,17 @@
     - signing_policy: {{ unifios.cert.signing_policy or "null" }}
     - private_key: {{ key_file }}
     {{ unifios.cert.certificate_managed | dict_to_sls_yaml_params | indent(4) }}
-{%- if "signing_private_key" not in unifios.cert.certificate_managed %}
+{%-   if "signing_private_key" not in unifios.cert.certificate_managed %}
     # This will be a self-signed certificate
     - signing_private_key: {{ key_file }}
-{%- endif %}
+{%-   endif %}
     - mode: '0640'
     - user: root
     - group: unifi
     - makedirs: true
-{%-   if not unifios.cert.private_key_managed.get("new") or not salt["file.file_exists"](unifios.lookup.paths.api_key) %}
+{%-   if not unifios.cert.private_key_managed.get("new") or not salt["file.file_exists"](key_file) %}
     - require:
-      - {{ key_file }}_key
+      - x509: {{ key_file }}
 {%-   endif %}
 {%- endif %}
 
@@ -71,4 +69,4 @@ Unifi service is restarted:
     - name: unifi-core
     - enable: true
     - watch:
-      - {{ crt_file }}_crt
+      - x509: {{ crt_file }}
