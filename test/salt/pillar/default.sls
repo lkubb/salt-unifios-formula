@@ -14,6 +14,8 @@ unifios:
       releases_url: https://pypi.org/pypi/pip/json
     script_dir: /data/scripts
     working_dir: /data/salt_workdir
+  api_ratelimit:
+    login_success: 5
   authorized_keys:
     absent: []
     present: []

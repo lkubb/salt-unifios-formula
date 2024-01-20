@@ -38,6 +38,9 @@
         "working_dir": "/data/salt_workdir"
       },
       "settings": {
+        "api_ratelimit": {
+          "login_success": 5
+        },
         "authorized_keys": {
           "present": [],
           "absent": [],

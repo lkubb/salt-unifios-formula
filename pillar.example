@@ -2,6 +2,14 @@
 # yamllint disable rule:comments-indentation
 ---
 unifios:
+    # Manage API rate limits
+  api_ratelimit:
+      # The default is quite low if you have automation in place
+      # with clients that do not do caching. You will receive
+      # HTTP 429 Too Many Requests after you reach this limit.
+      # The actual API does not have default limits as low.
+      # This value is for successful logins per minute.
+    login_success: 5
 
     # Manage SSH keys for the root account.
     # This is just a helper. For more comprehensive OpenSSH management, I would

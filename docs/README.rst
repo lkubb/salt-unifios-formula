@@ -100,6 +100,14 @@ The specified packages **must** either be pure Python packages
 or have binary wheel distributions for the platform (``aarch64``).
 
 
+``unifios.mods.api_ratelimit``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The login API has several rate limits. For automations, especially
+the success login rate limit can be detrimental - you will receive
+HTTP 429 Too Many Requests if the client does not do caching.
+This state manages the mentioned rate limit as configured.
+
+
 ``unifios.mods.authorized_keys``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Manages SSH keys that can authenticate as root.
@@ -166,6 +174,11 @@ and the corresponding unit file.
 ``unifios.helpers.pip_pkgs.clean``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Removes pip and wanted packages.
+
+
+``unifios.mods.api_ratelimit.clean``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Resets managed rate limits to defaults.
 
 
 ``unifios.mods.authorized_keys.clean``
